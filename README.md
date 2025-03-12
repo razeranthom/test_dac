@@ -15,7 +15,7 @@ Confira se tudo foi baixado na sua pasta corrente.
 
 Você precisa do Python para executar os testes. Neste link você encontra um tutorial de como instalar o Python na sua máquina, seja MAC, Windows ou Linux:
 
-(https://realpython.com/installing-python/)[Installing Python]
+[https://realpython.com/installing-python/](Installing Python)
 
 ### Pacotes
 
