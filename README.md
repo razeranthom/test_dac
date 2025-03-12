@@ -1,5 +1,9 @@
 # DAC - Teste de Back-end
 
+Aqui está o passo a passo para execução dos testes do Back-end da disciplina de DAC.
+
+Este código está licenciado como [GNU GPL v3](https://github.com/razeranthom/test_dac/blob/main/LICENSE).
+
 ## Download do Repositório
 
 Para fazer o download dos fontes do repositório, execute o seguinte comando no terminal:
