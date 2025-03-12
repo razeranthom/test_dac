@@ -1,14 +1,24 @@
+######################################################
+# Testador de Back-end da disciplina de DAC
+#
+# Autor: Prof. Dr. Razer Anthom Nizer Rojas Montaño
+#
+# Necessário PyTest para execução
+######################################################
 from dotenv import load_dotenv
 import requests, os, time, json, datetime, random
 from datetime import timedelta, datetime
 
+### Biblioteca para simplificação de acesso a dados
 from test_dados import *
 
+### Header padrão sendo enviado nas comunicações
 HEADERS = {
     'Accept': '*/*',
     'User-Agent': 'request'
 }
 
+### Carga dos parâmetros no arquivo .env
 load_dotenv()
 URL = os.getenv("URL")
 ARQUIVO_TOKEN = os.getenv("ARQUIVO_TOKEN")
@@ -16,7 +26,8 @@ ARQUIVO_CACHE = os.getenv("ARQUIVO_CACHE")
 
 
 ####################################################
-# Helpers
+# Funções Helpers
+
 def salvar_token(token):
     with open(ARQUIVO_TOKEN, "w") as fp:
         fp.write(token)
@@ -48,10 +59,9 @@ def inserir_ou_alterar_cache(lista):
 #### TODO Usar o Faker na próxima versão!!!
 def gerar_cpf():                                                        
     cpf = [random.randint(0, 9) for x in range(9)]                              
-                                                                                
+                                                                               
     for _ in range(2):                                                          
-        val = sum([(len(cpf) + 1 - i) * v for i, v in enumerate(cpf)]) % 11      
-                                                                                
+        val = sum([(len(cpf) + 1 - i) * v for i, v in enumerate(cpf)]) % 11                                                                                   
         cpf.append(11 - val if val > 1 else 0)                                  
                                                                                 
     return '%s%s%s%s%s%s%s%s%s%s%s' % tuple(cpf)
@@ -67,8 +77,15 @@ def gerar_email():
 def gerar_senha():
     return obter_novo_codigo(4)
 
+
+####################################################
+# Agora começam as funções de teste ao back-end
+####################################################
+
+
 ####################################################
 # R00 - Reboot - apagar base
+
 def test_r00_reboot():
 
     resp = requests.get(URL + f"/reboot", 
@@ -95,11 +112,8 @@ def test_r01_autocadastro():
     assert r['cpf']==cpf
     assert r['email']==email
 
-    print("#############################################")
-    #senha = input("Digite a senha enviada por e-mail: ")
-    senha = r["senha"]
     print()
-    print("continuando...")
+    senha = input(f"    >>>> Digite a senha enviada no e-mail {email}: ")
 
     inserir_ou_alterar_cache([ 
         ("cliente_codigo", r["codigo"]),
@@ -199,7 +213,7 @@ def test_r02_logout():
 ####################################################
 # Login para o testes com cliente
 
-def test_r02_login_app():
+def test_r02_login_sistema():
     # Loga com o usuário recém criado, para usar o sistema
     test_r02_login_ok()
 
