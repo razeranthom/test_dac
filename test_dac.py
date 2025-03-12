@@ -139,7 +139,7 @@ def test_r01_autocadastro_duplicado():
 ####################################################
 # R02 - Login
 
-def test_r02_teste_se_logado():
+def test_r02_acesso_endpoint_sem_logar():
 
     cache = recuperar_cache()
     cliente = cache["cliente_codigo"]
@@ -149,6 +149,20 @@ def test_r02_teste_se_logado():
     
     # ainda não está logado, não pode acessar
     assert resp.status_code==401
+
+def test_r02_acesso_endpoint_token_incorreto():
+
+    HEADERS["Authorization"] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImZ1bmNfOTlAZ21haWwuY29tIiwic2VuaGEiOiI1NjQzIiwiZXhwIjoxNzQxODA5MzI4fQ.1mZHb2FFarMywbYdocvittD-SQdzNV7WvPeT5VRQ3h8"
+    cache = recuperar_cache()
+    cliente = cache["cliente_codigo"]
+
+    resp = requests.get(URL + f"/clientes/{cliente}", 
+                         headers=HEADERS)
+    
+    # ainda não está logado, não pode acessar
+    assert resp.status_code==401
+
+
 
 
 def test_r02_login_erro():
@@ -450,7 +464,7 @@ def test_r07_efetuar_reserva1():
     milhas2 = int(cache["milhas2"])
     saldo_milhas = int(cache["saldo_milhas"])
 
-    milhas_usadas = random.randint(500, milhas1)
+    milhas_usadas = random.randint(100, milhas1-500)
     milhas_depois_uso = saldo_milhas - milhas_usadas
 
     reserva = {
