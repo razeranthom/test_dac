@@ -47,7 +47,7 @@ No parâmetro URL, coloque o endpoint a ser testado, sem a barra final.
 Para executar os testes, no terminal rode o seguinte comando:
 
 ```
-pytest -v test_dac.py
+pytest -s -v test_dac.py
 ```
 
 Ao executar você vai perceber a criação de 2 arquivos (cujos nomes estão no arquivo .env). Um contém o token de login e outro contém um cache com dados que são usados entre as chamadas dos testes.
