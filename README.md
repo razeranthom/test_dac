@@ -1,10 +1,29 @@
 # DAC - Teste de Back-end
 
+## Download do Repositório
+
+Para fazer o download dos fontes do repositório, execute o seguinte comando no terminal:
+
+```
+git clone https://github.com/razeranthom/test_dac.git
+```
+Confira se tudo foi baixado na sua pasta corrente.
+
 ## Instalação
 
 ### Python
 
+Você precisa do Python para executar os testes. Neste link você encontra um tutorial de como instalar o Python na sua máquina, seja MAC, Windows ou Linux:
+
+(https://realpython.com/installing-python/)[Installing Python]
+
 ### Pacotes
+
+Para instalar os pacotes necessários, execute o seguinte comando no terminal.
+
+```
+pip3 install -r requirements.txt
+```
 
 ## Configuração
 
