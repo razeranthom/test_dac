@@ -594,6 +594,47 @@ def test_r07_efetuar_reserva3():
         ("saldo_milhas", milhas_depois_uso)
     ])
 
+def test_r07_efetuar_reserva_nao_embarcar():
+    token = recuperar_token()
+    HEADERS["Authorization"] = token
+
+    cache = recuperar_cache()
+    codigo = cache["cliente_codigo"]
+    voo = cache["voo2"]
+    milhas1 = int(cache["milhas1"])
+    milhas2 = int(cache["milhas2"])
+    saldo_milhas = int(cache["saldo_milhas"])
+    milhas_usadas = random.randint(10, 20)
+    milhas_depois_uso = saldo_milhas - milhas_usadas
+
+    reserva = {
+            "valor": 50.00,
+            "milhas_utilizadas": milhas_usadas,
+            "quantidade_poltronas": 1,
+            "codigo_cliente": codigo,
+            "codigo_voo": voo,
+            "codigo_aeroporto_origem": VOO2_PRE_ORIGEM,
+            "codigo_aeroporto_destino": VOO2_PRE_DESTINO
+    }
+    resp = requests.post(URL + f"/reservas", 
+                         headers=HEADERS,
+                         json=reserva)
+    
+    assert resp.status_code==201
+
+    r = resp.json()
+    assert r["codigo_cliente"]==codigo and r["estado"]=="CONFIRMADA"
+    assert r["voo"]["codigo"]==voo
+    assert r["voo"]["aeroporto_origem"]["codigo"]==VOO2_PRE_ORIGEM
+    assert r["voo"]["aeroporto_destino"]["codigo"]==VOO2_PRE_DESTINO
+
+    inserir_ou_alterar_cache([ 
+        ("reserva_nao_embarcar", r["codigo"]),
+        ("milhas_usadas_nao_embarcar", milhas_usadas),
+        ("saldo_milhas", milhas_depois_uso)
+    ])
+
+
     # Verifica se as milhas foram descontadas
     resp = requests.get(URL + f"/clientes/{codigo}/milhas", 
                          headers=HEADERS)
@@ -792,7 +833,7 @@ def test_r09_consulta_reserva3():
 ####################################################
 # R08 - Cancelar Reserva
 
-def test_r08_cancelar_reserva():
+def test_r08_cancelar_reserva1():
     token = recuperar_token()
     HEADERS["Authorization"] = token
 
@@ -824,7 +865,7 @@ def test_r08_cancelar_reserva():
 ####################################################
 # R10 - Check-in
 
-def test_r10_checkin():
+def test_r10_checkin_reserva2():
     token = recuperar_token()
     HEADERS["Authorization"] = token
 
@@ -1111,7 +1152,7 @@ def test_r13_cancelamento_voo():
     r = resp.json()
     assert r["codigo"]==reserva
     assert r["codigo_cliente"]==codigo
-    assert r["estado"] == "CANCELADA"
+    assert r["estado"] == "CANCELADA VOO"
     assert r["voo"]["codigo"] == voo
     assert r["voo"]["aeroporto_origem"]["codigo"] == VOO3_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"] == VOO3_PRE_DESTINO
@@ -1126,6 +1167,7 @@ def test_r14_realizacao_voo():
 
     cache = recuperar_cache()
     reserva = cache["reserva2"]
+    reserva_nao_embarcar = cache["reserva_nao_embarcar"]
     codigo = cache["cliente_codigo"]
     voo = cache["voo2"]
 
@@ -1160,7 +1202,20 @@ def test_r14_realizacao_voo():
 
     r = resp.json()
     assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo and r["estado"]=="REALIZADA"
+    assert r["codigo_cliente"]==codigo
+    assert r["estado"]=="REALIZADA"
+
+    ### Verifica se a Reserva não embarcada do Voo2 passou para NÃO REALIZADA
+    resp = requests.get(URL + f"/reservas/{reserva_nao_embarcar}", 
+                         headers=HEADERS)
+    
+    assert resp.status_code==200
+
+    r = resp.json()
+    assert r["codigo"]==reserva_nao_embarcar
+    assert r["codigo_cliente"]==codigo 
+    assert r["estado"]=="NÃO REALIZADA"
+
 
 
 ####################################################
