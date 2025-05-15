@@ -6,7 +6,7 @@ USUARIO1 = {
     "saldo_milhas": 0,
     "endereco": {
         "cep": "80000001",
-        "uf": "Paraná",
+        "uf": "PR",
         "cidade": "Curitiba",
         "bairro": "Bairro 1",
         "rua": "Rua 1",
@@ -53,15 +53,15 @@ FUNCIONARIO2 = {
         "senha": ""
     }
 
-VOO1_PRE_DATA = "2025-08-10T10:30Z-03:00"
+VOO1_PRE_DATA = "2025-08-10T10:30-03:00"
 VOO1_PRE_ORIGEM = "POA"
 VOO1_PRE_DESTINO = "CWB"
 
-VOO2_PRE_DATA = "2025-09-11T09:30Z-03:00"
+VOO2_PRE_DATA = "2025-09-11T09:30-03:00"
 VOO2_PRE_ORIGEM = "CWB"
 VOO2_PRE_DESTINO = "GIG"
 
-VOO3_PRE_DATA = "2025-10-12T08:30Z-03:00"
+VOO3_PRE_DATA = "2025-10-12T08:30-03:00"
 VOO3_PRE_ORIGEM = "CWB"
 VOO3_PRE_DESTINO = "POA"
 

@@ -372,7 +372,7 @@ def test_r07_buscar_voos():
     HEADERS["Authorization"] = token
 
     agora = datetime.now()
-    data_voo_str = agora.strftime("%Y-%m-%dT%H:%M:%SZ-03:00")
+    data_voo_str = agora.strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
     #### 1o voo
     params = {
@@ -389,7 +389,7 @@ def test_r07_buscar_voos():
     assert r["origem"]==VOO1_PRE_ORIGEM and r["destino"]==VOO1_PRE_DESTINO
     assert len(r["voos"])>0
 
-    data_dt = time.strptime(r["data"], "%Y-%m-%d")
+    data_dt = time.strptime(r["data"][:10], "%Y-%m-%d")
     for v in r["voos"]:
         assert v["aeroporto_origem"]["codigo"] == VOO1_PRE_ORIGEM
         assert v["aeroporto_destino"]["codigo"] == VOO1_PRE_DESTINO
@@ -415,7 +415,7 @@ def test_r07_buscar_voos():
     assert r["origem"]==VOO2_PRE_ORIGEM and r["destino"]==VOO2_PRE_DESTINO
     assert len(r["voos"])>0
 
-    data_dt = time.strptime(r["data"], "%Y-%m-%d")
+    data_dt = time.strptime(r["data"][:10], "%Y-%m-%d")
     for v in r["voos"]:
         assert v["aeroporto_origem"]["codigo"] == VOO2_PRE_ORIGEM
         assert v["aeroporto_destino"]["codigo"] == VOO2_PRE_DESTINO
@@ -441,7 +441,7 @@ def test_r07_buscar_voos():
     assert r["origem"]==VOO3_PRE_ORIGEM and r["destino"]==VOO3_PRE_DESTINO
     assert len(r["voos"])>0
 
-    data_dt = time.strptime(r["data"], "%Y-%m-%d")
+    data_dt = time.strptime(r["data"][:10], "%Y-%m-%d")
     for v in r["voos"]:
         assert v["aeroporto_origem"]["codigo"] == VOO3_PRE_ORIGEM
         assert v["aeroporto_destino"]["codigo"] == VOO3_PRE_DESTINO
@@ -481,7 +481,7 @@ def test_r07_efetuar_reserva1():
     assert resp.status_code==201
 
     r = resp.json()
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CONFIRMADA"
+    assert r["codigo_cliente"]==codigo and r["estado"]=="CRIADA"
     assert r["voo"]["codigo"]==voo
     assert r["voo"]["aeroporto_origem"]["codigo"]==VOO1_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"]==VOO1_PRE_DESTINO
@@ -532,7 +532,7 @@ def test_r07_efetuar_reserva2():
     assert resp.status_code==201
 
     r = resp.json()
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CONFIRMADA"
+    assert r["codigo_cliente"]==codigo and r["estado"]=="CRIADA"
     assert r["voo"]["codigo"]==voo
     assert r["voo"]["aeroporto_origem"]["codigo"]==VOO2_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"]==VOO2_PRE_DESTINO
@@ -583,7 +583,7 @@ def test_r07_efetuar_reserva3():
     assert resp.status_code==201
 
     r = resp.json()
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CONFIRMADA"
+    assert r["codigo_cliente"]==codigo and r["estado"]=="CRIADA"
     assert r["voo"]["codigo"]==voo
     assert r["voo"]["aeroporto_origem"]["codigo"]==VOO3_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"]==VOO3_PRE_DESTINO
@@ -623,7 +623,7 @@ def test_r07_efetuar_reserva_nao_embarcar():
     assert resp.status_code==201
 
     r = resp.json()
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CONFIRMADA"
+    assert r["codigo_cliente"]==codigo and r["estado"]=="CRIADA"
     assert r["voo"]["codigo"]==voo
     assert r["voo"]["aeroporto_origem"]["codigo"]==VOO2_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"]==VOO2_PRE_DESTINO
@@ -741,7 +741,7 @@ def test_r07_efetuar_reserva_todas_as_milhas_usadas():
     assert resp.status_code==201
 
     r = resp.json()
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CONFIRMADA"
+    assert r["codigo_cliente"]==codigo and r["estado"]=="CRIADA"
     assert r["voo"]["codigo"]==voo
     assert r["voo"]["aeroporto_origem"]["codigo"]==VOO3_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"]==VOO3_PRE_DESTINO
@@ -778,7 +778,7 @@ def test_r09_consulta_reserva1():
     assert resp.status_code==200
     assert r["codigo"]==reserva1
     assert r["codigo_cliente"]==codigo
-    assert r["estado"] == "CONFIRMADA"
+    assert r["estado"] == "CRIADA"
     assert r["voo"]["codigo"] == voo1
     assert r["voo"]["aeroporto_origem"]["codigo"] == VOO1_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"] == VOO1_PRE_DESTINO
@@ -800,7 +800,7 @@ def test_r09_consulta_reserva2():
     assert resp.status_code==200
     assert r["codigo"]==reserva2
     assert r["codigo_cliente"]==codigo
-    assert r["estado"] == "CONFIRMADA"
+    assert r["estado"] == "CRIADA"
     assert r["voo"]["codigo"] == voo2
     assert r["voo"]["aeroporto_origem"]["codigo"] == VOO2_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"] == VOO2_PRE_DESTINO
@@ -824,7 +824,7 @@ def test_r09_consulta_reserva3():
     assert resp.status_code==200
     assert r["codigo"]==reserva3
     assert r["codigo_cliente"]==codigo
-    assert r["estado"] == "CONFIRMADA"
+    assert r["estado"] == "CRIADA"
     assert r["voo"]["codigo"] == voo3
     assert r["voo"]["aeroporto_origem"]["codigo"] == VOO3_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"] == VOO3_PRE_DESTINO
@@ -963,7 +963,7 @@ def test_r15_inserir_voo1():
     agora = datetime.now()
     delta = timedelta(days=1)
     data_voo = agora + delta
-    data_voo_str = data_voo.strftime("%Y-%m-%dT%H:%M:%SZ-03:00")
+    data_voo_str = data_voo.strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
     novo_voo = {
         "data": data_voo_str, 
@@ -993,8 +993,15 @@ def test_r15_inserir_voo1():
     r = resp.json()
     assert r["codigo"]==codigo
     assert r["estado"]=="CONFIRMADO"
-    assert r["codigo_aeroporto_origem"]==VOO1_ORIGEM
-    assert r["codigo_aeroporto_destino"]==VOO1_DESTINO
+    assert r["aeroporto_origem"]["codigo"]==VOO1_ORIGEM
+    assert r["aeroporto_destino"]["codigo"]==VOO1_DESTINO
+
+    # resp.json() retornando data convertida para UTC??
+    print("!!! r15 - inserir voo 1 - ver a comparação de datas")
+    # data_r = datetime.strptime(r["data"], "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=3)
+    # data_voo = datetime.strptime(data_voo_str, "%Y-%m-%dT%H:%M:%S-03:00") 
+    # assert data_r == data_voo_str
+
     assert r["data"] == data_voo_str
 
 def test_r15_inserir_voo2():
@@ -1004,7 +1011,7 @@ def test_r15_inserir_voo2():
     agora = datetime.now()
     delta = timedelta(days=1, minutes=30)
     data_voo = agora + delta
-    data_voo_str = data_voo.strftime("%Y-%m-%dT%H:%M:%SZ-03:00")
+    data_voo_str = data_voo.strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
     novo_voo = {
         "data": data_voo_str, 
@@ -1034,8 +1041,14 @@ def test_r15_inserir_voo2():
     r = resp.json()
     assert r["codigo"]==codigo
     assert r["estado"]=="CONFIRMADO"
-    assert r["codigo_aeroporto_origem"]==VOO2_ORIGEM
-    assert r["codigo_aeroporto_destino"]==VOO2_DESTINO
+    assert r["aeroporto_origem"]["codigo"]==VOO2_ORIGEM
+    assert r["aeroporto_destino"]["codigo"]==VOO2_DESTINO
+
+    # print("!!! r15 - inserir voo 1 - ver a comparação de datas")
+    # data_r = datetime.strptime(r["data"], "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=3)
+    # data_voo = datetime.strptime(data_voo_str, "%Y-%m-%dT%H:%M:%S-03:00") 
+    # assert data_r == data_voo_str
+
     assert r["data"] == data_voo_str
 
 def test_r15_inserir_voo3():
@@ -1045,7 +1058,7 @@ def test_r15_inserir_voo3():
     agora = datetime.now()
     delta = timedelta(days=5, minutes=30)
     data_voo = agora + delta
-    data_voo_str = data_voo.strftime("%Y-%m-%dT%H:%M:%SZ-03:00")
+    data_voo_str = data_voo.strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
     novo_voo = {
         "data": data_voo_str, 
@@ -1075,8 +1088,14 @@ def test_r15_inserir_voo3():
     r = resp.json()
     assert r["codigo"]==codigo
     assert r["estado"]=="CONFIRMADO"
-    assert r["codigo_aeroporto_origem"]==VOO3_ORIGEM
-    assert r["codigo_aeroporto_destino"]==VOO3_DESTINO
+    assert r["aeroporto_origem"]["codigo"]==VOO3_ORIGEM
+    assert r["aeroporto_destino"]["codigo"]==VOO3_DESTINO
+
+    # print("!!! r15 - inserir voo 1 - ver a comparação de datas")
+    # data_r = datetime.strptime(r["data"], "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=3)
+    # data_voo = datetime.strptime(data_voo_str, "%Y-%m-%dT%H:%M:%S-03:00") 
+    # assert data_r == data_voo_str
+
     assert r["data"] == data_voo_str
 
 
