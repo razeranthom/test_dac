@@ -967,7 +967,7 @@ def test_r15_inserir_voo1():
 
     novo_voo = {
         "data": data_voo_str, 
-        "valor_passagem": "111.00",
+        "valor_passagem": 111.00,
         "quantidade_poltronas_total": 111,
         "quantidade_poltronas_ocupadas": 11,
         "codigo_aeroporto_origem": VOO1_ORIGEM,
@@ -997,7 +997,6 @@ def test_r15_inserir_voo1():
     assert r["aeroporto_destino"]["codigo"]==VOO1_DESTINO
 
     # resp.json() retornando data convertida para UTC??
-    print("!!! r15 - inserir voo 1 - ver a comparação de datas")
     # data_r = datetime.strptime(r["data"], "%Y-%m-%dT%H:%M:%SZ") - timedelta(hours=3)
     # data_voo = datetime.strptime(data_voo_str, "%Y-%m-%dT%H:%M:%S-03:00") 
     # assert data_r == data_voo_str
