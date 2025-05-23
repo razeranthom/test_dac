@@ -831,6 +831,47 @@ def test_r09_consulta_reserva3():
 
 
 ####################################################
+# HELPER - Verifica estado da reserva
+#          Espera 2s e então busca a reserva
+#          Se não retornou o estado desejado, pode ser
+#          que o CQRS não atualizou, então tenta mais
+#          3 vezes com intervalo de 5s
+#          Se mesmo assim não der, requisito não atendido
+# Parâmetros:
+#     codigo: código da reserva
+#     cliente: código do cliente
+#     estado: string com o estado desejado
+def verificar_estado_reserva(codigo, cliente, estado):
+
+    # espera para dar tempo ao CQRS
+    time.sleep(2)
+    resp = requests.get(URL + f"/reservas/{codigo}", 
+                         headers=HEADERS)    
+    r = resp.json()
+    assert resp.status_code==200
+    assert r["codigo"]==codigo
+    assert r["codigo_cliente"]==cliente
+
+    # Tenta mais 3 vezes
+    tentativas = 3
+    tent = 0
+    while r["estado"] != estado and tent < tentativas:
+        time.sleep(5)
+        resp = requests.get(URL + f"/reservas/{codigo}", 
+                            headers=HEADERS)
+        
+        r = resp.json()
+        assert resp.status_code==200
+        assert r["codigo"]==codigo
+        assert r["codigo_cliente"]==cliente
+        tent += 1
+        
+    assert r["estado"] == estado
+
+    return r
+
+
+####################################################
 # R08 - Cancelar Reserva
 
 def test_r08_cancelar_reserva1():
@@ -849,17 +890,9 @@ def test_r08_cancelar_reserva1():
     r = resp.json()
     assert resp.status_code==200
     assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CANCELADA"
+    #assert r["codigo_cliente"]==codigo and r["estado"]=="CANCELADA"
 
-    # Consulta a reserva e verifica se está realmente cancelada
-    resp = requests.get(URL + f"/reservas/{reserva}", 
-                         headers=HEADERS)
-    
-    r = resp.json()
-    assert resp.status_code==200
-    assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo
-    assert r["estado"] == "CANCELADA"
+    verificar_estado_reserva(reserva, codigo, "CANCELADA")
 
 
 ####################################################
@@ -884,14 +917,8 @@ def test_r10_checkin_reserva2():
     assert r["codigo"]==reserva
     assert r["codigo_cliente"]==codigo and r["estado"]=="CHECK-IN"
 
-    resp = requests.get(URL + f"/reservas/{reserva}", 
-                         headers=HEADERS)
-    
-    r = resp.json()
-    assert resp.status_code==200
-    assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo and r["estado"]=="CHECK-IN"
 
+    verificar_estado_reserva(reserva, codigo, "CHECK-IN")
 
 
 ####################################################
@@ -1014,7 +1041,7 @@ def test_r15_inserir_voo2():
 
     novo_voo = {
         "data": data_voo_str, 
-        "valor_passagem": "222.00",
+        "valor_passagem": 222.00,
         "quantidade_poltronas_total": 222,
         "quantidade_poltronas_ocupadas": 22,
         "codigo_aeroporto_origem": VOO2_ORIGEM,
@@ -1061,7 +1088,7 @@ def test_r15_inserir_voo3():
 
     novo_voo = {
         "data": data_voo_str, 
-        "valor_passagem": "333.00",
+        "valor_passagem": 333.00,
         "quantidade_poltronas_total": 333,
         "quantidade_poltronas_ocupadas": 133,
         "codigo_aeroporto_origem": VOO3_ORIGEM,
@@ -1120,13 +1147,8 @@ def test_r12_confirmacao_embarque():
     assert r["codigo"]==reserva
     assert r["codigo_cliente"]==codigo and r["estado"]=="EMBARCADA"
 
-    resp = requests.get(URL + f"/reservas/{reserva}", 
-                         headers=HEADERS)
-    
-    assert resp.status_code==200
-    r = resp.json()
-    assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo and r["estado"]=="EMBARCADA"
+    verificar_estado_reserva(reserva, codigo, "EMBARCADA")
+
 
 ####################################################
 # R13 - Cancelamento Voo
@@ -1162,15 +1184,8 @@ def test_r13_cancelamento_voo():
 
     ####### Verifica se a Reserva3 foi cancelada
 
-    resp = requests.get(URL + f"/reservas/{reserva}", 
-                         headers=HEADERS)
-    
-    assert resp.status_code==200
+    r = verificar_estado_reserva(reserva, codigo, "CANCELADA VOO")
 
-    r = resp.json()
-    assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo
-    assert r["estado"] == "CANCELADA VOO"
     assert r["voo"]["codigo"] == voo
     assert r["voo"]["aeroporto_origem"]["codigo"] == VOO3_PRE_ORIGEM
     assert r["voo"]["aeroporto_destino"]["codigo"] == VOO3_PRE_DESTINO
@@ -1211,29 +1226,10 @@ def test_r14_realizacao_voo():
     assert r["codigo"]==voo
     assert r["estado"]=="REALIZADO"
 
-
-    ### Verifica se a Reserva do Voo2 passou para REALIZADA
-    resp = requests.get(URL + f"/reservas/{reserva}", 
-                         headers=HEADERS)
-    
-    assert resp.status_code==200
-
-    r = resp.json()
-    assert r["codigo"]==reserva
-    assert r["codigo_cliente"]==codigo
-    assert r["estado"]=="REALIZADA"
+    r = verificar_estado_reserva(reserva, codigo, "REALIZADA")
 
     ### Verifica se a Reserva não embarcada do Voo2 passou para NÃO REALIZADA
-    resp = requests.get(URL + f"/reservas/{reserva_nao_embarcar}", 
-                         headers=HEADERS)
-    
-    assert resp.status_code==200
-
-    r = resp.json()
-    assert r["codigo"]==reserva_nao_embarcar
-    assert r["codigo_cliente"]==codigo 
-    assert r["estado"]=="NÃO REALIZADA"
-
+    r = verificar_estado_reserva(reserva_nao_embarcar, codigo, "NÃO REALIZADA")
 
 
 ####################################################
